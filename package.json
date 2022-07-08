@@ -3,7 +3,7 @@
     "version": "0.1.0",
     "private": true,
     "scripts": {
-        "dev:dev": "cross-env NODE_ENV=development BASE_ENV=development webpack-dev-server -c webpack/webpack.dev.js",
+        "dev:dev": "cross-env NODE_ENV=development BASE_ENV=development webpack server -c webpack/webpack.dev.js",
         "dev:test": "cross-env NODE_ENV=development BASE_ENV=test webpack-dev-server -c webpack/webpack.dev.js",
         "dev:pre": "cross-env NODE_ENV=development BASE_ENV=pre webpack-dev-server -c webpack/webpack.dev.js",
         "dev:prod": "cross-env NODE_ENV=development BASE_ENV=production webpack-dev-server -c webpack/webpack.dev.js",

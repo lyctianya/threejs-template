@@ -1,4 +1,5 @@
 import * as THREE from 'three'
+import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils.js'
 class CloudView {
     private container: any
     private camera: any
@@ -83,20 +84,33 @@ void main() {
             transparent: true
         })
 
-        const plane = new THREE.Mesh(new THREE.PlaneGeometry(64, 64), material)
+        const geometries = []
+
+        const plane = new THREE.PlaneGeometry(64, 64)
+        const position = new THREE.Vector3()
+        const rotation = new THREE.Euler()
+        const quaternion = new THREE.Quaternion()
+        const scale = new THREE.Vector3()
+
         for (var i = 0; i < 8000; i++) {
-            plane.position.x = Math.random() * 1000 - 500
-            plane.position.y = -Math.random() * Math.random() * 200 - 15
-            plane.position.z = i
-            plane.rotation.z = Math.random() * Math.PI
-            plane.scale.x = plane.scale.y = Math.random() * Math.random() * 1.5 + 0.5
-
-            this.scene.add(plane.clone())
-
-            const mesh2 = plane.clone()
-            mesh2.position.z = -8000
-            this.scene.add(mesh2)
+            const matrix = new THREE.Matrix4()
+            position.x = Math.random() * 1000 - 500
+            position.y = -Math.random() * Math.random() * 200 - 15
+            position.z = i
+            rotation.z = Math.random() * Math.PI
+            quaternion.setFromEuler(rotation)
+            scale.x = scale.y = Math.random() * Math.random() * 1.5 + 0.5
+            matrix.compose(position, quaternion, scale)
+            geometries.push(plane.clone().applyMatrix4(matrix))
         }
+        const geometry = BufferGeometryUtils.mergeBufferGeometries(geometries)
+        geometry.computeBoundingSphere()
+        const mesh = new THREE.Mesh(geometry, material)
+
+        this.scene.add(mesh)
+        const mesh2 = mesh.clone()
+        mesh2.position.z = -8000
+        this.scene.add(mesh2)
 
         this.renderer = new THREE.WebGLRenderer({ antialias: false, alpha: true })
         this.renderer.setSize(window.innerWidth, window.innerHeight)
@@ -107,7 +121,6 @@ void main() {
         this.mouseX = (event.clientX - this.windowHalfX) * 0.25
         this.mouseY = (event.clientY - this.windowHalfY) * 0.15
     }
-
     animate() {
         requestAnimationFrame(this.animate.bind(this))
 
