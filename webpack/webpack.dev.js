@@ -1,6 +1,7 @@
-const path = require('path');
-const { merge } = require('webpack-merge');
-const Common = require('./webpack.common.js');
+const path = require('path')
+const { merge } = require('webpack-merge')
+const Common = require('./webpack.common.js')
+const paths = require('./getPath')
 
 // 合并公共配置,并添加开发环境配置
 module.exports = merge(Common, {
@@ -13,7 +14,7 @@ module.exports = merge(Common, {
         historyApiFallback: true, // 当使用 HTML5 History API 时，任意的 404 响应都可能需要被替代为 index.html
         open: true,
         static: {
-            directory: path.join(__dirname, '../public') //托管静态资源public文件夹
+            directory: paths.PUBLIC //托管静态资源public文件夹
         }
     }
-});
+})

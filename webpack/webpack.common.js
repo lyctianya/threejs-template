@@ -1,17 +1,21 @@
 // webpack.base.js  webpack 的公共配置
 
-const path = require('path');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const webpack = require('webpack');
-const CopyPlugin = require('copy-webpack-plugin');
-const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const path = require('path')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+const webpack = require('webpack')
+const CopyPlugin = require('copy-webpack-plugin')
+const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin')
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
+const paths = require('./getPath')
+const { getPath } = paths
 
-const isDev = process.env.NODE_ENV === 'development'; // 是否是开发模式
+const isDev = process.env.NODE_ENV === 'development' // 是否是开发模式
 
 module.exports = {
     // 入口文件
-    entry: path.join(__dirname, '../src/index.tsx'),
+    entry: {
+        app: getPath('src/index.tsx')
+    },
     // 开启缓存
     cache: {
         type: 'filesystem' // 使用文件缓存
@@ -19,7 +23,7 @@ module.exports = {
     // 打包出口文件
     output: {
         filename: 'static/js/[name].[chunkhash:8].js', // 加上[chunkhash:8]是为了防止缓存
-        path: path.join(__dirname, '../dist'),
+        path: paths.DIST,
         // 自动删除 dist 文件夹
         clean: true
         // 打包后文件的公共前缀路径
@@ -29,13 +33,13 @@ module.exports = {
         // 配置省略后缀名， 必须加上 .xxx  .xxx
         extensions: ['.js', '.jsx', '.ts', '.tsx'],
         alias: {
-            '@': path.join(__dirname, '../src')
+            '@': paths.SRC
         }
     },
     module: {
         rules: [
             {
-                include: [path.resolve(__dirname, '../src')], // 只对项目src文件的ts,tsx进行loader解析
+                include: [paths.SRC], // 只对项目src文件的ts,tsx进行loader解析
                 // modules: [path.resolve(__dirname, '../node_modules')],
                 test: /.(ts|tsx)$/, // 匹配.ts, tsx文件
                 use: ['thread-loader', 'babel-loader']
@@ -51,7 +55,7 @@ module.exports = {
                 // }
             },
             {
-                include: [path.resolve(__dirname, '../src')],
+                include: [paths.SRC],
                 // modules: [path.resolve(__dirname, '../node_modules')],
                 test: /.(css|less)$/, // 匹配.css文件
                 use: [
@@ -79,7 +83,7 @@ module.exports = {
     },
     plugins: [
         new HtmlWebpackPlugin({
-            template: path.join(__dirname, '../public/index.html'),
+            template: getPath('public/index.html'),
             inject: true // 自动注入静态资源
         }),
         new webpack.DefinePlugin({
@@ -89,17 +93,22 @@ module.exports = {
         new CopyPlugin({
             patterns: [
                 {
-                    from: path.resolve(__dirname, '../public'), // 复制public下文件
-                    to: path.resolve(__dirname, '../dist'), // 复制到dist目录中
+                    from: paths.PUBLIC, // 复制public下文件
+                    to: paths.DIST, // 复制到dist目录中
                     filter: (source) => {
-                        return !source.includes('index.html'); // 忽略index.html
+                        return !source.includes('index.html') // 忽略index.html
                     }
+                },
+                {
+                    from: getPath('static'),
+                    to: 'static',
+                    noErrorOnMissing: true
                 }
             ]
         }),
         new ReactRefreshWebpackPlugin() // 添加热更新插件
     ]
-};
+}
 
-console.log('NODE_ENV', process.env.NODE_ENV);
-console.log('BASE_ENV', process.env.BASE_ENV);
+console.log('NODE_ENV', process.env.NODE_ENV)
+console.log('BASE_ENV', process.env.BASE_ENV)

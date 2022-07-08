@@ -1,13 +1,15 @@
-const { merge } = require('webpack-merge');
-const Common = require('./webpack.common.js');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const CssMinimizerPlugin = require('css-minimizer-webpack-plugin'); // 压缩CSS
-const TerserPlugin = require('terser-webpack-plugin'); // 压缩JS  --- 开发环境
-const globAll = require('glob-all');
-const PurgeCSSPlugin = require('purgecss-webpack-plugin');
-const path = require('path');
-const CompressionPlugin = require('compression-webpack-plugin');
-const glob = require('glob');
+const { merge } = require('webpack-merge')
+const Common = require('./webpack.common.js')
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
+const CssMinimizerPlugin = require('css-minimizer-webpack-plugin') // 压缩CSS
+const TerserPlugin = require('terser-webpack-plugin') // 压缩JS  --- 开发环境
+const globAll = require('glob-all')
+const PurgeCSSPlugin = require('purgecss-webpack-plugin')
+const path = require('path')
+const CompressionPlugin = require('compression-webpack-plugin')
+const glob = require('glob')
+const paths = require('./getPath')
+const { getPath } = paths
 
 module.exports = merge(Common, {
     mode: 'production',
@@ -36,7 +38,7 @@ module.exports = merge(Common, {
             new PurgeCSSPlugin({
                 // 检测src下所有tsx文件和public下index.html中使用的类名和id和标签名称
                 // 只打包这些文件中用到的样式
-                paths: globAll.sync([`${path.join(__dirname, '../src')}/**/*.tsx`, path.join(__dirname, '../public/index.html')])
+                paths: globAll.sync([`${paths.SRC}/**/*.tsx`, getPath('public/index.html')])
             }),
             // 压缩js
             new TerserPlugin({
@@ -70,4 +72,4 @@ module.exports = merge(Common, {
             }
         }
     }
-});
+})
